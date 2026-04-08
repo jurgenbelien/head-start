@@ -1,25 +1,21 @@
 import type { APIRoute } from 'astro';
-import type { RobotsTxtQuery } from '~/lib/datocms/types';
 import type { Root } from 'hast';
 import rehypeParse from 'rehype-parse';
 import rehypeRemark from 'rehype-remark';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { select } from 'hast-util-select';
-import { datocmsRequest } from '~/lib/datocms';
-import query from '../../_robots.query.graphql';
+import { getEntry } from '~/lib/content';
 
 export const prerender = false;
+
+const entry = await getEntry('App', 'default');
 
 const cache = new Map<string, { md: string; timestamp: number }>();
 const CACHE_TTL = 60000 * 5;
 
-export const GET: APIRoute = async ({ params, site, locals }) => {
-  const { app, site: datoSite } = await datocmsRequest<RobotsTxtQuery>({ query });
-  const allowAll = !datoSite.noIndex && !locals.isPreview;
-  const allowAiBots = allowAll && Boolean(app?.allowAiBots);
-  
-  if (!allowAiBots) {
+export const GET: APIRoute = async ({ params, site }) => {
+  if (!entry?.data.allowAiBots) {
     return new Response(null, { status: 404 });
   }
   
