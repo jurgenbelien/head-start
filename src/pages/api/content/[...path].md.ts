@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import type { Root } from 'hast';
 import rehypeParse from 'rehype-parse';
 import rehypeRemark from 'rehype-remark';
+import remarkGfm from 'remark-gfm';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 import { select } from 'hast-util-select';
@@ -56,6 +57,7 @@ export const GET: APIRoute = async ({ params, site }) => {
       }
     })
     .use(rehypeRemark)
+    .use(remarkGfm)
     .use(remarkStringify)
     .process(html);
   
